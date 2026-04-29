@@ -352,8 +352,29 @@
 
 
 
-    /* Phase 4.5: pasted Miura Shimbun template */
-   /* Phase 4.5: Miura Shimbun template - matched to standalone article */
+}
+/* ==============================
+   Phase Article / Miura Shimbun
+   2026.04.29 修正版
+============================== */
+
+.article-phase {
+  background: #f7f6f2;
+  color: #1e1e1e;
+  overflow: hidden;
+  font-family:
+    "Hiragino Mincho ProN",
+    "Yu Mincho",
+    "YuMincho",
+    "Noto Serif JP",
+    serif;
+}
+
+.article-scroll {
+  height: 100%;
+  overflow: hidden;
+}
+
 #articleInner.miura-page-wrap {
   --miura-bg: #f7f6f2;
   --miura-paper: #ffffff;
@@ -372,14 +393,9 @@
   min-height: 100vh;
   background: var(--miura-bg);
   color: var(--miura-ink);
-  font-family:
-    "Hiragino Mincho ProN",
-    "Yu Mincho",
-    "YuMincho",
-    "Noto Serif JP",
-    serif;
   line-height: 1.9;
   letter-spacing: 0.02em;
+  transform: translateY(0);
 }
 
 .miura-page-wrap a {
@@ -387,7 +403,7 @@
   text-decoration: none;
 }
 
-/* ── Topbar ── */
+/* 上部バー */
 .miura-topbar {
   border-bottom: 1px solid var(--miura-line);
   background: #efede7;
@@ -412,7 +428,7 @@
   flex-wrap: wrap;
 }
 
-/* ── Header ── */
+/* ヘッダー */
 .miura-header {
   background: var(--miura-paper);
   border-bottom: 2px solid #222;
@@ -447,7 +463,7 @@
   color: var(--miura-muted);
 }
 
-/* ── Nav ── */
+/* ナビ */
 .miura-nav {
   border-top: 1px solid var(--miura-line);
   background: #fcfbf8;
@@ -466,14 +482,13 @@
   padding: 13px 0;
   font-size: 0.95rem;
   color: #333;
-  text-decoration: none;
 }
 
 .miura-nav a:hover {
   color: var(--miura-accent);
 }
 
-/* ── Layout ── */
+/* レイアウト */
 .miura-page {
   padding: 32px 20px 48px;
 }
@@ -485,7 +500,7 @@
   align-items: start;
 }
 
-/* ── Article ── */
+/* 記事本体 */
 .miura-article {
   background: var(--miura-paper);
   border: 1px solid var(--miura-line);
@@ -500,24 +515,21 @@
   margin-bottom: 14px;
 }
 
-.miura-category {
+.miura-category,
+.miura-category-sub {
   display: inline-block;
-  margin-bottom: 14px;
   padding: 4px 10px;
-  font-family: var(--sans);
+  font-family: var(--sans, sans-serif);
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   color: #fff;
+}
+
+.miura-category {
   background: var(--miura-accent);
 }
 
 .miura-category-sub {
-  display: inline-block;
-  padding: 4px 10px;
-  font-family: var(--sans);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  color: #fff;
   background: var(--miura-accent-dark);
 }
 
@@ -542,7 +554,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px 14px;
-  font-family: var(--sans);
+  font-family: var(--sans, sans-serif);
   font-size: 0.84rem;
   color: var(--miura-muted);
   margin-bottom: 24px;
@@ -561,53 +573,36 @@
 .miura-article p {
   margin: 0 0 18px;
   font-size: 1rem;
+  line-height: 2;
 }
 
-/* 逮捕者リスト */
-.miura-arrest-list {
-  margin: 0 0 18px;
-  padding: 18px 20px 14px;
-  background: #fafaf8;
-  border-left: 3px solid #888;
-  list-style: none;
-}
-
-.miura-arrest-list li {
-  margin-bottom: 6px;
-  font-size: 1rem;
-  padding-left: 1em;
-  position: relative;
-}
-
-.miura-arrest-list li::before {
-  content: "・";
-  position: absolute;
-  left: 0;
-}
-
-.miura-article-end-note {
-  margin-top: 28px;
+/* 戻るリンク */
+.miura-back-link {
+  margin-top: 30px;
   padding-top: 18px;
   border-top: 1px solid var(--miura-line);
-  font-size: 0.94rem;
+  font-family: var(--sans, sans-serif);
+  font-size: 0.9rem;
   color: var(--miura-muted);
 }
 
-.miura-fiction-note {
+.miura-back-link a:hover {
+  color: var(--miura-accent);
+}
+
+/* フィクション注記 */
+.miura-note {
   margin-top: 32px;
   padding-top: 14px;
   border-top: 1px solid var(--miura-line);
-  color: #aaa;
+  color: #999;
+  font-family: var(--sans, sans-serif);
   font-size: 0.78rem;
   line-height: 1.8;
   text-align: right;
 }
 
-.miura-article-bottom-spacer {
-  height: 160px;
-}
-
-/* ── Sidebar ── */
+/* サイドバー */
 .miura-sidebar {
   min-width: 0;
 }
@@ -645,7 +640,6 @@
   display: block;
   padding: 14px 16px;
   color: inherit;
-  text-decoration: none;
   transition: background 0.2s ease;
 }
 
@@ -656,7 +650,7 @@
 .miura-related-date {
   display: block;
   margin-bottom: 6px;
-  font-family: var(--sans);
+  font-family: var(--sans, sans-serif);
   font-size: 0.78rem;
   color: var(--miura-muted);
 }
@@ -667,7 +661,7 @@
   line-height: 1.6;
 }
 
-/* ── Footer ── */
+/* フッター */
 .miura-footer {
   margin-top: 44px;
   border-top: 2px solid #222;
@@ -677,7 +671,7 @@
 .miura-footer-inner {
   padding: 20px;
   color: var(--miura-muted);
-  font-family: var(--sans);
+  font-family: var(--sans, sans-serif);
   font-size: 0.88rem;
   display: flex;
   justify-content: space-between;
@@ -685,7 +679,7 @@
   flex-wrap: wrap;
 }
 
-/* ── Responsive ── */
+/* スマホ対応 */
 @media (max-width: 900px) {
   .miura-grid {
     grid-template-columns: 1fr;
@@ -697,8 +691,17 @@
 }
 
 @media (max-width: 600px) {
+  .miura-topbar-inner {
+    font-size: 0.76rem;
+  }
+
   .miura-header-inner {
     padding: 20px 16px 16px;
+  }
+
+  .miura-nav-inner {
+    padding: 0 16px;
+    gap: 18px;
   }
 
   .miura-page {
@@ -711,6 +714,16 @@
 
   .miura-article-title {
     font-size: 1.4rem;
+    line-height: 1.55;
+  }
+
+  .miura-article p {
+    font-size: 0.96rem;
+    line-height: 2;
+  }
+
+  .miura-note {
+    text-align: left;
   }
 }
     /* Phase 5: epilogue */
