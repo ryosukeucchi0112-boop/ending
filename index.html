@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ENDING SEQUENCE | SUZUKI</title>
+  <meta name="description" content="ENDING SEQUENCE - 偽りの執刀医と消された告発" />
+  <style>
+    :root {
+      --bg: #05070a;
+      --bg2: #0b0f14;
+      --green: #7cffb2;
+      --green-dim: #2f9b64;
+      --white: #f5f1e8;
+      --muted: #9ca3af;
+      --paper: #f7f4ed;
+      --ink: #171717;
+      --red: #9f1d1d;
+      --line: rgba(255,255,255,.14);
+      --serif: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; min-height: 100%; background: var(--bg); color: var(--white); font-family: var(--sans); overflow: hidden; }
+    button { font: inherit; }
+
+    .app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(72, 98, 120, .16), transparent 32%),
+        linear-gradient(180deg, #05070a 0%, #0b0f14 100%);
+    }
+
+    .phase {
+      position: absolute;
+      inset: 0;
+      display: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    .phase.active { display: block; opacity: 1; }
+    .phase.fade-out { opacity: 0; }
+
+    .scanlines::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.025),
+        rgba(255,255,255,.025) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      mix-blend-mode: screen;
+      opacity: .35;
+    }
+
+    .noise {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .08;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.25) 0 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,.22) 0 1px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,.18) 0 1px, transparent 1px);
+      background-size: 13px 17px, 19px 23px, 29px 31px;
+      animation: noiseMove .7s steps(2) infinite;
+    }
+    @keyframes noiseMove { 0% { transform: translate(0,0); } 100% { transform: translate(-10px, 7px); } }
+
+    /* Phase 1: police terminal */
+    .terminal {
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: #050806;
+      color: var(--green);
+      font-family: var(--mono);
+    }
+    .terminal-card {
+      width: min(760px, 100%);
+      border: 1px solid rgba(124,255,178,.32);
+      background: rgba(0,20,10,.54);
+      box-shadow: 0 0 60px rgba(29,255,133,.08), inset 0 0 30px rgba(29,255,133,.04);
+      padding: 18px;
+    }
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(124,255,178,.24);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: rgba(124,255,178,.75);
+    }
+    .terminal-body {
+      min-height: 310px;
+      font-size: clamp(13px, 3.4vw, 16px);
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+    .caret::after {
+      content: "█";
+      animation: blink 1s steps(1) infinite;
+      margin-left: 2px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .next-button {
+      display: none;
+      margin-top: 18px;
+      width: 100%;
+      border: 1px solid rgba(124,255,178,.5);
+      background: rgba(124,255,178,.08);
+      color: var(--green);
+      padding: 14px 16px;
+      cursor: pointer;
+      letter-spacing: .08em;
+    }
+    .next-button.visible { display: block; }
+    .next-button:active { transform: translateY(1px); }
+
+    /* Phase 2: blackout */
+    .blackout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      font-family: var(--mono);
+      color: rgba(255,255,255,.66);
+      letter-spacing: .12em;
+      font-size: 12px;
+    }
+    .blackout-text { opacity: 0; animation: dimIn 1.8s ease forwards; }
+    @keyframes dimIn { to { opacity: 1; } }
+
+    /* Phase 3: search */
+    .search-phase {
+      background: #f5f6f8;
+      color: #111827;
+      font-family: var(--sans);
+      overflow: hidden;
+    }
+    .search-wrap {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 18px;
+    }
+    .search-logo {
+      margin-top: min(12vh, 76px);
+      font-family: var(--mono);
+      font-size: clamp(24px, 7vw, 46px);
+      letter-spacing: .08em;
+      font-weight: 700;
+      color: #111827;
+    }
+    .search-sub {
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #6b7280;
+      letter-spacing: .06em;
+    }
+    .search-box {
+      margin-top: 34px;
+      width: min(720px, 100%);
+      display: flex;
+      gap: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+      padding: 10px;
+      border-radius: 999px;
+      box-shadow: 0 18px 60px rgba(15, 23, 42, .08);
+    }
+    .search-input {
+      flex: 1;
+      min-height: 38px;
+      border: 0;
+      outline: none;
+      padding: 0 14px;
+      font-size: 17px;
+      background: transparent;
+    }
+    .search-button {
+      border: 0;
+      background: #111827;
+      color: white;
+      border-radius: 999px;
+      padding: 0 18px;
+      font-size: 13px;
+      letter-spacing: .06em;
+    }
+    .search-status {
+      margin-top: 18px;
+      width: min(720px, 100%);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #6b7280;
+      min-height: 20px;
+    }
+    .result-list {
+      display: none;
+      margin-top: 26px;
+      width: min(720px, 100%);
+    }
+    .result-list.visible { display: block; animation: slideUp .7s ease both; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .result-card {
+      padding: 18px 18px 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      box-shadow: 0 16px 45px rgba(15, 23, 42, .08);
+    }
+    .result-source {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .result-title {
+      color: #1d4ed8;
+      font-size: clamp(18px, 4.8vw, 22px);
+      line-height: 1.35;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .result-snippet {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Phase 4: article */
+    .article-phase {
+      background: var(--paper);
+      color: var(--ink);
+      overflow: hidden;
+      font-family: var(--serif);
+    }
+    .article-scroll {
+      height: 100%;
+      overflow: hidden;
+    }
+    .article-inner {
+      width: min(820px, 100%);
+      margin: 0 auto;
+      padding: 28px 20px 90px;
+      transform: translateY(0);
+    }
+    .newspaper-head {
+      border-bottom: 3px double #111;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+    .paper-logo {
+      font-family: var(--serif);
+      font-size: clamp(28px, 8vw, 46px);
+      font-weight: 700;
+      letter-spacing: .14em;
+    }
+    .paper-meta-line {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #555;
+    }
+    .article-kicker {
+      display: inline-block;
+      border: 1px solid #111;
+      padding: 4px 8px;
+      font-size: 12px;
+      margin-bottom: 14px;
+      font-family: var(--sans);
+    }
+    .article-title {
+      font-size: clamp(26px, 7vw, 44px);
+      line-height: 1.25;
+      margin: 0 0 10px;
+      letter-spacing: .03em;
+    }
+    .article-subtitle {
+      font-size: clamp(16px, 4.2vw, 22px);
+      line-height: 1.5;
+      margin: 0 0 18px;
+      color: #444;
+      border-left: 4px solid #111;
+      padding-left: 12px;
+    }
+    .article-byline {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: #555;
+      border-bottom: 1px solid #bbb;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+    .article-body p {
+      font-size: clamp(16px, 4.2vw, 19px);
+      line-height: 2.05;
+      margin: 0 0 1.35em;
+      letter-spacing: .02em;
+    }
+    .article-note {
+      margin-top: 34px;
+      padding: 18px;
+      border: 1px solid #b9b1a3;
+      background: rgba(255,255,255,.42);
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.8;
+      color: #555;
+    }
+
+    /* Phase 5: epilogue */
+    .epilogue-phase {
+      background: #000;
+      color: var(--white);
+      overflow: hidden;
+      font-family: var(--serif);
+    }
+    .epilogue-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.48), rgba(0,0,0,.86)),
+        radial-gradient(circle at 50% 38%, rgba(180, 192, 198, .2), transparent 34%),
+        linear-gradient(180deg, #0a0d10, #000 75%);
+      transition: background 2s ease;
+    }
+    .epilogue-bg.scene-hospital {
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.36), rgba(0,0,0,.78)),
+        radial-gradient(circle at 74% 30%, rgba(255, 238, 190, .34), transparent 22%),
+        linear-gradient(120deg, #111820, #2a3034 45%, #0b0f14);
+    }
+    .epilogue-bg.scene-road {
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.78)),
+        radial-gradient(circle at 52% 18%, rgba(245, 206, 132, .42), transparent 26%),
+        linear-gradient(180deg, #1b2930, #12170f 54%, #050605);
+    }
+    .epilogue-bg.scene-hill {
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.66)),
+        radial-gradient(circle at 50% 24%, rgba(255, 210, 132, .48), transparent 24%),
+        linear-gradient(180deg, #263942, #26331e 55%, #080908);
+    }
+    .epilogue-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .42;
+      display: none;
+    }
+    .epilogue-video.available { display: block; }
+    .epilogue-text-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      text-align: center;
+    }
+    .epilogue-line {
+      max-width: 760px;
+      font-size: clamp(22px, 6vw, 42px);
+      line-height: 1.75;
+      letter-spacing: .08em;
+      text-shadow: 0 2px 24px rgba(0,0,0,.9);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 1.4s ease, transform 1.4s ease;
+    }
+    .epilogue-line.visible { opacity: 1; transform: translateY(0); }
+    .epilogue-line.small { font-size: clamp(18px, 5vw, 32px); }
+
+    /* Phase 6: credits */
+    .credits-phase {
+      background: #000;
+      color: rgba(255,255,255,.86);
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .credits-content { opacity: 0; animation: creditsIn 2.2s ease forwards; }
+    @keyframes creditsIn { to { opacity: 1; } }
+    .closed {
+      font-size: 12px;
+      letter-spacing: .18em;
+      color: rgba(255,255,255,.56);
+      margin-bottom: 34px;
+    }
+    .suzuki {
+      font-size: clamp(18px, 5vw, 30px);
+      letter-spacing: .22em;
+      margin-bottom: 44px;
+    }
+    .final-button {
+      display: inline-block;
+      color: white;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.06);
+      text-decoration: none;
+      padding: 13px 22px;
+      border-radius: 999px;
+      letter-spacing: .08em;
+      font-size: 13px;
+      opacity: 0;
+      animation: finalBtn 1.2s ease 2.6s forwards;
+    }
+    @keyframes finalBtn { to { opacity: 1; } }
+
+    .hidden-audio { display: none; }
+
+    @media (max-width: 520px) {
+      .terminal { padding: 14px; }
+      .terminal-card { padding: 14px; }
+      .terminal-header { font-size: 10px; }
+      .search-wrap { padding: 22px 14px; }
+      .search-box { padding: 8px; }
+      .search-button { padding: 0 14px; }
+      .article-inner { padding: 22px 17px 80px; }
+      .paper-meta-line { display: block; line-height: 1.7; }
+      .epilogue-text-wrap { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <section class="phase active scanlines" id="phase-terminal">
+      <div class="noise"></div>
+      <div class="terminal">
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <span>HAMAMATSU CENTRAL NORTH POLICE / RECEIVE TERMINAL</span>
+            <span>04.18 02:11</span>
+          </div>
+          <div class="terminal-body caret" id="terminalText"></div>
+          <button class="next-button" id="startBtn">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="phase blackout" id="phase-blackout">
+      <div class="noise"></div>
+      <div class="blackout-text" id="blackoutText">04.17 接続を終了しています</div>
+    </section>
+
+    <section class="phase search-phase" id="phase-search">
+      <div class="search-wrap">
+        <div class="search-logo">TEMPORAL SEARCH</div>
+        <div class="search-sub">ARCHIVED WEB DOMAIN / 2026.04.17</div>
+        <div class="search-box">
+          <input class="search-input" id="searchInput" aria-label="search" readonly />
+          <button class="search-button">SEARCH</button>
+        </div>
+        <div class="search-status" id="searchStatus"></div>
+        <div class="result-list" id="resultList">
+          <div class="result-card">
+            <div class="result-source">三浦新聞｜2026年4月18日 02:16</div>
+            <div class="result-title">朝倉澪さんの転落事件、関係者三名を逮捕</div>
+            <div class="result-snippet">成瀬栞さん死亡事案との関連浮上。浜松中央北署は18日未明、城南記念総合病院の医師、学校法人関係者ら三名を逮捕したと発表した...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="phase article-phase" id="phase-article">
+      <div class="article-scroll" id="articleScroll">
+        <article class="article-inner" id="articleInner">
+          <header class="newspaper-head">
+            <div class="paper-logo">三浦新聞</div>
+            <div class="paper-meta-line">
+              <span>MIURA SHIMBUN DIGITAL</span>
+              <span>2026年4月18日 02:16</span>
+            </div>
+          </header>
+
+          <div class="article-kicker">速報</div>
+          <h1 class="article-title">朝倉澪さんの転落事件、関係者三名を逮捕</h1>
+          <p class="article-subtitle">成瀬栞さん死亡事案との関連浮上</p>
+          <div class="article-byline">記者：三浦さやか</div>
+
+          <div class="article-body">
+            <p>浜松中央北署は18日未明、私立星浜学園高等部の女子生徒・朝倉澪さんが校内で転落し、意識不明の状態で城南記念総合病院へ搬送された事件について、関係者三名を逮捕したと発表した。</p>
+            <p>逮捕されたのは、城南記念総合病院の医師・藍沢晋作容疑者、学校法人関係者で同病院の運営にも関与していた黒崎恒一郎容疑者、同学園関係者の黒崎蓮司容疑者の三名。</p>
+            <p>捜査関係者によると、三名は約三か月前に発生した成瀬栞さんの死亡事案に関する医療記録の改ざん、および朝倉さんに対する圧力行為に関与した疑いがある。</p>
+            <p>また、朝倉さんが一連の記録を調べていたことを把握したうえで、証拠隠滅を図っていた可能性もあるとみて、同署は関係先の押収資料を詳しく調べている。</p>
+            <p>朝倉さんは現在、命に別状はないものの、治療と安全確保のため、別の医療機関への転院に向けて調整が進められている。</p>
+          </div>
+
+          <div class="article-note">
+            本記事は、捜査関係者への取材および同署発表に基づく。成瀬栞さん死亡事案については、今後も医療記録の改ざん有無を含め、詳しい経緯が調べられる見通し。
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="phase epilogue-phase" id="phase-epilogue">
+      <div class="epilogue-bg" id="epilogueBg"></div>
+      <video class="epilogue-video" id="epilogueVideo" src="assets/epilogue.mp4" muted playsinline loop></video>
+      <div class="noise"></div>
+      <div class="epilogue-text-wrap">
+        <div class="epilogue-line" id="epilogueLine"></div>
+      </div>
+    </section>
+
+    <section class="phase credits-phase" id="phase-credits">
+      <div class="credits-content">
+        <div class="closed">connection closed</div>
+        <div class="suzuki">by SUZUKI</div>
+        <a class="final-button" href="#" onclick="return false;">感想を書く</a>
+      </div>
+    </section>
+  </div>
+
+  <audio class="hidden-audio" id="bgm" src="assets/bgm.mp3" preload="auto" loop></audio>
+  <audio class="hidden-audio" id="typingSound" src="assets/typing.mp3" preload="auto" loop></audio>
+  <audio class="hidden-audio" id="clickSound" src="assets/click.mp3" preload="auto"></audio>
+  <audio class="hidden-audio" id="noiseSound" src="assets/noise.mp3" preload="auto"></audio>
+
+  <script>
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const phases = {
+      terminal: document.getElementById('phase-terminal'),
+      blackout: document.getElementById('phase-blackout'),
+      search: document.getElementById('phase-search'),
+      article: document.getElementById('phase-article'),
+      epilogue: document.getElementById('phase-epilogue'),
+      credits: document.getElementById('phase-credits'),
+    };
+
+    const audio = {
+      bgm: document.getElementById('bgm'),
+      typing: document.getElementById('typingSound'),
+      click: document.getElementById('clickSound'),
+      noise: document.getElementById('noiseSound'),
+    };
+
+    function safePlay(el) {
+      if (!el) return;
+      try {
+        const p = el.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      } catch (_) {}
+    }
+
+    function safePause(el) {
+      if (!el) return;
+      try { el.pause(); } catch (_) {}
+    }
+
+    async function switchPhase(next) {
+      const current = document.querySelector('.phase.active');
+      if (current) {
+        current.classList.add('fade-out');
+        await sleep(900);
+        current.classList.remove('active', 'fade-out');
+      }
+      next.classList.add('active');
+      await sleep(300);
+    }
+
+    async function typeText(target, text, speed = 32) {
+      target.textContent = '';
+      safePlay(audio.typing);
+      for (let i = 0; i < text.length; i++) {
+        target.textContent += text[i];
+        if (text[i] === '\n') await sleep(speed * 4);
+        else await sleep(speed + Math.random() * 18);
+      }
+      safePause(audio.typing);
+    }
+
+    async function initTerminal() {
+      const terminalText = document.getElementById('terminalText');
+      const startBtn = document.getElementById('startBtn');
+      const text =
+`通報内容を送信しました。
+
+添付資料を照合しています...
+
+照合完了
+緊急性：高
+対応区分：即時対応
+担当：浜松中央北署　野上孝明
+
+通報は受理されました。`;
+      await typeText(terminalText, text, 25);
+      terminalText.classList.remove('caret');
+      await sleep(900);
+      startBtn.classList.add('visible');
+    }
+
+    async function runBlackout() {
+      await switchPhase(phases.blackout);
+      safePlay(audio.noise);
+      await sleep(2900);
+    }
+
+    async function runSearch() {
+      await switchPhase(phases.search);
+      const input = document.getElementById('searchInput');
+      const status = document.getElementById('searchStatus');
+      const results = document.getElementById('resultList');
+
+      status.textContent = '記録領域に接続しています...';
+      await sleep(1100);
+      status.textContent = '検索語を復元しています...';
+      await sleep(800);
+      await typeText(input, '朝倉澪', 140);
+      await sleep(900);
+      safePlay(audio.click);
+      status.textContent = '検索中...';
+      await sleep(1200);
+      status.textContent = '1件の更新済み記録が見つかりました';
+      results.classList.add('visible');
+      await sleep(3400);
+      safePlay(audio.click);
+    }
+
+    async function runArticle() {
+      await switchPhase(phases.article);
+      const scroller = document.getElementById('articleScroll');
+      const inner = document.getElementById('articleInner');
+      scroller.scrollTop = 0;
+      await sleep(1300);
+
+      const maxScroll = Math.max(0, inner.offsetHeight - window.innerHeight + 40);
+      const duration = 15500;
+      const start = performance.now();
+
+      await new Promise(resolve => {
+        function step(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+          scroller.scrollTop = eased * maxScroll;
+          if (t < 1) requestAnimationFrame(step);
+          else resolve();
+        }
+        requestAnimationFrame(step);
+      });
+
+      await sleep(2600);
+    }
+
+    const epilogueLines = [
+      { text: '君の通報は、届いた。', scene: 'dark', hold: 2500 },
+      { text: '本来、助からなかった彼女は、\n助かった。', scene: 'dark', hold: 3300 },
+      { text: '黒崎たちは逮捕された。', scene: 'dark', hold: 2600 },
+      { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', scene: 'dark', hold: 3900 },
+      { text: 'その悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', scene: 'dark', hold: 4300 },
+      { text: 'しかし。', scene: 'dark', hold: 2100 },
+      { text: '成瀬栞は、\nもう帰らない。', scene: 'dark', hold: 3600 },
+      { text: 'どれだけ真実が明らかになっても。\n彼らが罪を償っても。', scene: 'dark', hold: 4300 },
+      { text: '彼女の時間は、戻らない。', scene: 'dark', hold: 3300 },
+      { text: '笑っていた日も。\n果たすはずだった約束も。', scene: 'dark', hold: 4100 },
+      { text: 'もう、\n誰にも取り戻せない。', scene: 'dark', hold: 3600 },
+      { text: 'それでも。', scene: 'hospital', hold: 2200 },
+      { text: '朝倉澪の時間は、\n止まらない。', scene: 'hospital', hold: 3700 },
+      { text: '目を覚ました彼女は、\n歩き出す。', scene: 'hospital', hold: 3500 },
+      { text: 'もういない彼女を、\n探すように。', scene: 'road', hold: 3500 },
+      { text: '彼女との思い出を、\nたどるように。', scene: 'road', hold: 3600 },
+      { text: 'あの約束の山から見える景色を、\nもう一度見るために。', scene: 'hill', hold: 4600 },
+      { text: '朝倉澪は歩き始める。', scene: 'hill', hold: 3200 },
+      { text: 'もういない彼女と、\n共に。', scene: 'hill', hold: 4700 },
+    ];
+
+    function setScene(scene) {
+      const bg = document.getElementById('epilogueBg');
+      bg.classList.remove('scene-hospital', 'scene-road', 'scene-hill');
+      if (scene === 'hospital') bg.classList.add('scene-hospital');
+      if (scene === 'road') bg.classList.add('scene-road');
+      if (scene === 'hill') bg.classList.add('scene-hill');
+    }
+
+    async function runEpilogue() {
+      await switchPhase(phases.epilogue);
+      safePlay(audio.bgm);
+
+      const video = document.getElementById('epilogueVideo');
+      video.addEventListener('loadeddata', () => {
+        video.classList.add('available');
+        safePlay(video);
+      }, { once: true });
+      try { video.load(); } catch (_) {}
+
+      const line = document.getElementById('epilogueLine');
+      await sleep(1400);
+      for (const item of epilogueLines) {
+        setScene(item.scene);
+        line.textContent = item.text;
+        line.classList.add('visible');
+        await sleep(item.hold);
+        line.classList.remove('visible');
+        await sleep(1050);
+      }
+    }
+
+    async function runCredits() {
+      await switchPhase(phases.credits);
+      await sleep(8000);
+    }
+
+    async function startSequence() {
+      document.getElementById('startBtn').disabled = true;
+      await runBlackout();
+      await runSearch();
+      await runArticle();
+      await switchPhase(phases.blackout);
+      document.getElementById('blackoutText').textContent = '';
+      await sleep(1700);
+      await runEpilogue();
+      await runCredits();
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startSequence);
+    initTerminal();
+  </script>
+</body>
+</html>
