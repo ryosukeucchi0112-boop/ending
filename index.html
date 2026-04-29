@@ -117,19 +117,30 @@
       margin-left: 2px;
     }
     @keyframes blink { 50% { opacity: 0; } }
-    .next-button {
-      display: none;
-      margin-top: 18px;
-      width: 100%;
-      border: 1px solid rgba(124,255,178,.5);
-      background: rgba(124,255,178,.08);
-      color: var(--green);
-      padding: 14px 16px;
-      cursor: pointer;
-      letter-spacing: .08em;
-    }
-    .next-button.visible { display: block; }
-    .next-button:active { transform: translateY(1px); }
+   .next-button {
+  display: none;
+  position: relative;
+  z-index: 20;
+  margin-top: 18px;
+  width: 100%;
+  border: 1px solid rgba(124,255,178,.5);
+  background: rgba(124,255,178,.08);
+  color: var(--green);
+  padding: 14px 16px;
+  cursor: pointer;
+  letter-spacing: .08em;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: rgba(124,255,178,.18);
+  touch-action: manipulation;
+}
+
+.next-button.visible {
+  display: block;
+}
+
+.next-button:active {
+  transform: translateY(1px);
+}
 
     /* Phase 2: blackout */
     .blackout {
@@ -459,7 +470,7 @@
             <span>04.18 02:11</span>
           </div>
           <div class="terminal-body caret" id="terminalText"></div>
-          <button class="next-button" id="startBtn">次へ</button>
+         <button class="next-button" id="startBtn" type="button" onclick="startSequence()">次へ</button>
         </div>
       </div>
     </section>
@@ -585,16 +596,28 @@
       await sleep(300);
     }
 
-    async function typeText(target, text, speed = 32) {
-      target.textContent = '';
-      safePlay(audio.typing);
-      for (let i = 0; i < text.length; i++) {
-        target.textContent += text[i];
-        if (text[i] === '\n') await sleep(speed * 4);
-        else await sleep(speed + Math.random() * 18);
-      }
-      safePause(audio.typing);
+  async function typeText(target, text, speed = 32) {
+  if ('value' in target) {
+    target.value = '';
+  } else {
+    target.textContent = '';
+  }
+
+  safePlay(audio.typing);
+
+  for (let i = 0; i < text.length; i++) {
+    if ('value' in target) {
+      target.value += text[i];
+    } else {
+      target.textContent += text[i];
     }
+
+    if (text[i] === '\n') await sleep(speed * 4);
+    else await sleep(speed + Math.random() * 18);
+  }
+
+  safePause(audio.typing);
+}
 
     async function initTerminal() {
       const terminalText = document.getElementById('terminalText');
@@ -726,20 +749,37 @@
       await sleep(8000);
     }
 
-    async function startSequence() {
-      document.getElementById('startBtn').disabled = true;
-      await runBlackout();
-      await runSearch();
-      await runArticle();
-      await switchPhase(phases.blackout);
-      document.getElementById('blackoutText').textContent = '';
-      await sleep(1700);
-      await runEpilogue();
-      await runCredits();
-    }
+   let sequenceStarted = false;
 
-    document.getElementById('startBtn').addEventListener('click', startSequence);
-    initTerminal();
+async function startSequence() {
+  if (sequenceStarted) return;
+  sequenceStarted = true;
+
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.style.pointerEvents = 'none';
+
+  await runBlackout();
+  await runSearch();
+  await runArticle();
+  await switchPhase(phases.blackout);
+  document.getElementById('blackoutText').textContent = '';
+  await sleep(1700);
+  await runEpilogue();
+  await runCredits();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('startBtn');
+
+  btn.addEventListener('click', startSequence);
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    startSequence();
+  }, { passive: false });
+
+  initTerminal();
+});
   </script>
 </body>
 </html>
