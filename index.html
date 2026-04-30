@@ -352,7 +352,6 @@
 
 
 
-}
 /* ==============================
    Phase Article / Miura Shimbun
    2026.04.29 修正版
@@ -1063,7 +1062,7 @@
 
     <section class="phase epilogue-phase" id="phase-epilogue">
       <div class="epilogue-bg" id="epilogueBg"></div>
-      <video class="epilogue-video" id="epilogueVideo" src="assets/epilogue.mp4" muted playsinline preload="auto"></video>
+      <video class="epilogue-video" id="epilogueVideo" src="assets/epilogue.mp4" playsinline preload="auto"></video>
       <div class="noise"></div>
       <div class="epilogue-text-wrap">
         <div class="epilogue-line" id="epilogueLine"></div>
@@ -1127,28 +1126,28 @@
       await sleep(300);
     }
 
-  async function typeText(target, text, speed = 32) {
-  if ('value' in target) {
-    target.value = '';
-  } else {
-    target.textContent = '';
-  }
+    async function typeText(target, text, speed = 32) {
+      if ('value' in target) {
+        target.value = '';
+      } else {
+        target.textContent = '';
+      }
 
-  safePlay(audio.typing);
+      safePlay(audio.typing);
 
-  for (let i = 0; i < text.length; i++) {
-    if ('value' in target) {
-      target.value += text[i];
-    } else {
-      target.textContent += text[i];
+      for (let i = 0; i < text.length; i++) {
+        if ('value' in target) {
+          target.value += text[i];
+        } else {
+          target.textContent += text[i];
+        }
+
+        if (text[i] === '\n') await sleep(speed * 4);
+        else await sleep(speed + Math.random() * 18);
+      }
+
+      safePause(audio.typing);
     }
-
-    if (text[i] === '\n') await sleep(speed * 4);
-    else await sleep(speed + Math.random() * 18);
-  }
-
-  safePause(audio.typing);
-}
 
     async function initTerminal() {
       const terminalText = document.getElementById('terminalText');
@@ -1202,13 +1201,18 @@
       const scroller = document.getElementById('articleScroll');
       const inner = document.getElementById('articleInner');
       scroller.scrollTop = 0;
-      await sleep(900);
 
-      // 記事は最後まで行かず、本文を読める位置で止める。
-      // 「けれど。」の直前に暗転へ切り替えるための余白を残す。
+      // 参照scriptに合わせて、記事表示後すぐではなく少し読ませてからスクロール開始。
+      await sleep(1300);
+
+      // 記事は最後まで行かず、本文を読める位置で停止。
+      // 「けれど。」で後半動画に入るため、スクロール量だけ途中停止に調整。
       const maxScroll = Math.max(0, inner.scrollHeight - window.innerHeight + 40);
-      const stopRatio = 0.62; // 止める位置。低い=上で止まる / 高い=下まで進む
+      const stopRatio = 0.62;
       const targetScroll = maxScroll * stopRatio;
+
+      // 記事スクロール開始までのタイミングは参照script寄せ。
+      // 長さは「けれど。」前に止めたいので、前回の途中停止版に合わせる。
       const duration = 11800;
       const start = performance.now();
 
@@ -1223,137 +1227,141 @@
         requestAnimationFrame(step);
       });
 
-      // 途中で止まったまま、字幕を少し読ませる。
       await sleep(1200);
     }
 
-  // ── ナレーション完全版 ──────────────────────────────────────────────────
-  // 0〜2：TEMPORAL SEARCH / 検索結果
-  // 3〜5：三浦新聞 記事ページ
-  // 6〜7：暗転。「けれど。」の後もすぐ映像を出さない
-  // 8以降：作成済み動画の上に字幕を重ねる
-  const narrationLines = [
-    { text: '君の通報は、届いた。', hold: 2800 },
-    { text: '本来、助からなかった彼女は、\n助かった。', hold: 3500 },
-    { text: '朝倉澪の名前が、\nもう一度、表示される。', hold: 3800 },
+    // ── ナレーション完全版 ──────────────────────────────────────────────────
+    // 0〜2：TEMPORAL SEARCH / 検索結果
+    // 3〜5：三浦新聞 記事ページ
+    // 6以降：記事停止後、「けれど。」のタイミングで作成済み動画を開始
+    const narrationLines = [
+      { text: '君の通報は、届いた。', hold: 2800 },
+      { text: '本来、助からなかった彼女は、\n助かった。', hold: 3500 },
+      { text: '朝倉澪の名前が、\nもう一度、表示される。', hold: 3800 },
 
-    { text: '黒崎たちは逮捕された。', hold: 2800 },
-    { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', hold: 4000 },
-    { text: '彼らの悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', hold: 4600 },
+      { text: '黒崎たちは逮捕された。', hold: 2800 },
+      { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', hold: 4000 },
+      { text: '彼らの悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', hold: 4600 },
 
-    { text: 'けれど。', hold: 2200, black: true },
-    { text: 'すべてが、\n救われたわけではない。', hold: 3800, black: true },
+      { text: 'けれど。', hold: 2200, video: true },
+      { text: 'すべてが、\n救われたわけではない。', hold: 3800, video: true },
 
-    { text: '成瀬栞は、\nもう帰らない。', hold: 3800, video: true },
-    { text: '彼女の時間は、\n戻らない。', hold: 3600, video: true },
-    { text: '笑っていた日も。', hold: 2600, video: true },
-    { text: '果たすはずだった約束も。', hold: 2900, video: true },
-    { text: 'もう、\n誰にも取り戻せない。', hold: 4200, video: true },
+      { text: '成瀬栞は、\nもう帰らない。', hold: 3800, video: true },
+      { text: '彼女の時間は、\n戻らない。', hold: 3600, video: true },
+      { text: '笑っていた日も。', hold: 2600, video: true },
+      { text: '果たすはずだった約束も。', hold: 2900, video: true },
+      { text: 'もう、\n誰にも取り戻せない。', hold: 4200, video: true },
 
-    { text: 'それでも。', hold: 2400, video: true },
-    { text: '朝倉澪の時間は、\n止まらない。', hold: 3800, video: true },
-    { text: '目を覚ました彼女は、\n歩を進める。', hold: 3600, video: true },
-    { text: 'もういない彼女を、\n探すように。', hold: 3600, video: true },
-    { text: '彼女との思い出を、\nひとつずつ振り返るように。', hold: 4200, video: true },
+      { text: 'それでも。', hold: 2400, video: true },
+      { text: '朝倉澪の時間は、\n止まらない。', hold: 3800, video: true },
+      { text: '目を覚ました彼女は、\n歩を進める。', hold: 3600, video: true },
+      { text: 'もういない彼女を、\n探すように。', hold: 3600, video: true },
+      { text: '彼女との思い出を、\nひとつずつ振り返るように。', hold: 4200, video: true },
 
-    { text: 'あの約束の山から見える景色を、\nもう一度見るために。', hold: 4600, video: true },
-    { text: '朝倉澪は、\n歩き始める。', hold: 3400, video: true },
-    { text: 'もういない彼女と、\n共に。', hold: 5200, video: true },
-    { text: 'by SUZUKI', hold: 3000, black: true },
-  ];
+      { text: 'あの約束の山から見える景色を、\nもう一度見るために。', hold: 4600, video: true },
+      { text: '朝倉澪は、\n歩き始める。', hold: 3400, video: true },
+      { text: 'もういない彼女と、\n共に。', hold: 5200, video: true },
+      { text: 'by SUZUKI', hold: 3000, black: true },
+    ];
 
-  const SEARCH_NARRATION = narrationLines.slice(0, 3);
-  const ARTICLE_NARRATION = narrationLines.slice(3, 6);
-  const EPILOGUE_NARRATION = narrationLines.slice(6);
+    const PRE_EPILOGUE_NARRATION = narrationLines.slice(0, 6);
+    const EPILOGUE_NARRATION = narrationLines.slice(6);
 
-  async function showNarration(items) {
-    const overlay = document.getElementById('narrationOverlay');
-    const line = document.getElementById('narrationLine');
-    overlay.classList.remove('hidden');
+    async function showNarration(items, gap = 900) {
+      const overlay = document.getElementById('narrationOverlay');
+      const line = document.getElementById('narrationLine');
+      overlay.classList.remove('hidden');
 
-    for (const item of items) {
-      line.textContent = item.text;
-      line.classList.add('visible');
-      await sleep(item.hold);
-      line.classList.remove('visible');
-      await sleep(850);
+      for (const item of items) {
+        line.textContent = item.text;
+        line.classList.add('visible');
+        await sleep(item.hold);
+        line.classList.remove('visible');
+        await sleep(gap);
+      }
     }
-  }
 
-  function prepareEpilogueVideo() {
-    const video = document.getElementById('epilogueVideo');
-    video.classList.remove('available');
-    try {
-      video.currentTime = 0;
-      video.load();
-    } catch (_) {}
-    return video;
-  }
+    function prepareEpilogueVideo() {
+      const video = document.getElementById('epilogueVideo');
+      video.classList.remove('available');
+      try {
+        video.currentTime = 0;
+        video.load();
+      } catch (_) {}
+      return video;
+    }
 
-  async function showVideoOnEpilogue() {
-    const video = document.getElementById('epilogueVideo');
-    video.classList.add('available');
-    safePlay(video);
-  }
+    async function showVideoOnEpilogue() {
+      const video = document.getElementById('epilogueVideo');
+      video.classList.add('available');
 
-  async function runEpilogueWithNarration() {
-    await switchPhase(phases.epilogue);
-    const video = prepareEpilogueVideo();
+      // 動画自体にBGMや環境音を入れている場合、その音を使う。
+      // 無音動画として使う場合は、HTML側のvideoタグに muted を戻してください。
+      try { video.volume = 1; } catch (_) {}
+      safePlay(video);
+    }
 
-    // 後半シナリオ通り、「けれど。」と「すべてが〜」は完全な黒画面のまま。
-    await showNarration(EPILOGUE_NARRATION.slice(0, 2));
+    async function runVisualUntilArticleStop() {
+      await runBlackout();
+      await runSearch();
+      await runArticle();
+    }
 
-    // ここから作成済み動画を表示し、その上に既存字幕を重ねる。
-    await showVideoOnEpilogue();
-    await showNarration(EPILOGUE_NARRATION.slice(2, -1));
+    async function runEpilogueWithNarration() {
+      await switchPhase(phases.epilogue);
+      const video = prepareEpilogueVideo();
 
-    // by SUZUKI は動画から暗転した後に出す。
-    video.classList.remove('available');
-    await sleep(1200);
-    await showNarration(EPILOGUE_NARRATION.slice(-1));
-    safePause(video);
-  }
+      // 「けれど。」の字幕タイミングで動画を開始。
+      safePause(audio.bgm);
+      await showVideoOnEpilogue();
+      await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
+
+      // by SUZUKI は動画から暗転した後に出す。
+      video.classList.remove('available');
+      await sleep(1200);
+      await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
+      safePause(video);
+    }
 
     async function runCredits() {
       await switchPhase(phases.credits);
       await sleep(8000);
     }
 
-   let sequenceStarted = false;
+    let sequenceStarted = false;
 
-async function startSequence() {
-  if (sequenceStarted) return;
-  sequenceStarted = true;
-  document.getElementById('startBtn').disabled = true;
+    async function startSequence() {
+      if (sequenceStarted) return;
+      sequenceStarted = true;
+      document.getElementById('startBtn').disabled = true;
 
-  // BGMを後半から入れたい場合は、この行を runEpilogueWithNarration の直前に移動。
-  safePlay(audio.bgm);
+      // 参照scriptと同じ考え方：字幕は開始直後から通しで進め、
+      // 映像側は blackout → search → article の順に進める。
+      safePlay(audio.bgm);
 
-  await runBlackout();
-  await runSearch();
-  await showNarration(SEARCH_NARRATION);
+      const narrationPromise = showNarration(PRE_EPILOGUE_NARRATION, 900);
+      const visualPromise = runVisualUntilArticleStop();
 
-  const articlePromise = runArticle();
-  const articleNarrationPromise = showNarration(ARTICLE_NARRATION);
-  await Promise.all([articlePromise, articleNarrationPromise]);
+      await Promise.all([narrationPromise, visualPromise]);
 
-  // ここで「けれど。」に入る。記事ページは途中停止した状態から暗転する。
-  await runEpilogueWithNarration();
+      // ここで「けれど。」に入る。記事ページは途中停止した状態から、動画＋字幕へ切り替える。
+      await runEpilogueWithNarration();
 
-  document.getElementById('narrationOverlay').classList.add('hidden');
-  await runCredits();
-}
-window.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('startBtn');
+      document.getElementById('narrationOverlay').classList.add('hidden');
+      await runCredits();
+    }
 
-  btn.addEventListener('click', startSequence);
-  btn.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    startSequence();
-  }, { passive: false });
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('startBtn');
 
-  initTerminal();
-});
+      btn.addEventListener('click', startSequence);
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        startSequence();
+      }, { passive: false });
+
+      initTerminal();
+    });
   </script>
 </body>
 </html>
