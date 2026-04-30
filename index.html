@@ -773,15 +773,15 @@
     .epilogue-video.available { opacity: 1; }
 
     .epilogue-phase::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.48)),
-        radial-gradient(circle at 50% 50%, transparent 42%, rgba(0,0,0,.34));
-      z-index: 2;
-    }
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.28)),
+    radial-gradient(circle at 50% 50%, transparent 52%, rgba(0,0,0,.22));
+  z-index: 2;
+}
     .epilogue-text-wrap {
       position: absolute;
       inset: 0;
@@ -1288,7 +1288,25 @@
         await sleep(gap);
       }
     }
+async function unlockEpilogueVideo() {
+  const video = document.getElementById('epilogueVideo');
+  if (!video) return;
 
+  video.muted = true;
+  video.playsInline = true;
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+  video.controls = false;
+
+  try {
+    video.load();
+    await video.play();
+    video.pause();
+    video.currentTime = 0;
+  } catch (err) {
+    console.log('video unlock failed:', err);
+  }
+}
    function prepareEpilogueVideo() {
   const video = document.getElementById('epilogueVideo');
 
@@ -1317,10 +1335,8 @@ async function runVisualUntilArticleStop() {
 async function runEpilogueWithNarration() {
   const video = prepareEpilogueVideo();
 
-  // 記事ページからエピローグへ切り替え
   await switchPhase(phases.epilogue);
 
-  // ここで動画を表示
   video.classList.add('available');
 
   try {
@@ -1331,13 +1347,11 @@ async function runEpilogueWithNarration() {
     await video.play();
   } catch (err) {
     console.log('video play failed:', err);
-    video.controls = true;
+    // ここで controls=true にしない
   }
 
-  // 動画の上に字幕を乗せる
   await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
 
-  // by SUZUKI だけ最後に黒画面で出す
   video.classList.remove('available');
   await sleep(1200);
 
@@ -1350,28 +1364,32 @@ async function runEpilogueWithNarration() {
       await sleep(8000);
     }
 
-    let sequenceStarted = false;
+   let sequenceStarted = false;
 
-    async function startSequence() {
-      if (sequenceStarted) return;
-      sequenceStarted = true;
-      document.getElementById('startBtn').disabled = true;
+async function startSequence() {
+  if (sequenceStarted) return;
+  sequenceStarted = true;
 
-      // 参照scriptと同じ考え方：字幕は開始直後から通しで進め、
-      // 映像側は blackout → search → article の順に進める。
-      safePlay(audio.bgm);
+  // Safari/iPad対策：次へを押した瞬間に動画再生許可を取る
+  await unlockEpilogueVideo();
 
-      const narrationPromise = showNarration(PRE_EPILOGUE_NARRATION, 900);
-      const visualPromise = runVisualUntilArticleStop();
+  document.getElementById('startBtn').disabled = true;
 
-      await Promise.all([narrationPromise, visualPromise]);
+  // 参照scriptと同じ考え方：字幕は開始直後から通しで進め、
+  // 映像側は blackout → search → article の順に進める。
+  safePlay(audio.bgm);
 
-      // ここで「けれど。」に入る。記事ページは途中停止した状態から、動画＋字幕へ切り替える。
-      await runEpilogueWithNarration();
+  const narrationPromise = showNarration(PRE_EPILOGUE_NARRATION, 900);
+  const visualPromise = runVisualUntilArticleStop();
 
-      document.getElementById('narrationOverlay').classList.add('hidden');
-      await runCredits();
-    }
+  await Promise.all([narrationPromise, visualPromise]);
+
+  // ここで「けれど。」に入る。記事ページは途中停止した状態から、動画＋字幕へ切り替える。
+  await runEpilogueWithNarration();
+
+  document.getElementById('narrationOverlay').classList.add('hidden');
+  await runCredits();
+}
 
     window.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('startBtn');
