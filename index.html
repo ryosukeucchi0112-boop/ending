@@ -1289,84 +1289,43 @@
       }
     }
 
-    function prepareEpilogueVideo() {
-      const video = document.getElementById('epilogueVideo');
-      video.classList.remove('available');
-      try {
-        video.currentTime = 0;
-        video.load();
-      } catch (_) {}
-      return video;
-    }
-
-   async function showVideoOnEpilogue() {
+   function prepareEpilogueVideo() {
   const video = document.getElementById('epilogueVideo');
 
-  video.classList.add('available');
-
-  // Safari対策：音付き自動再生を避ける
-  video.muted = true;
-  video.playsInline = true;
-
-  try {
-    video.currentTime = 0;
-  } catch (_) {}
-
-  try {
-    await video.play();
-  } catch (err) {
-    console.log('video play failed:', err);
-    video.controls = true; // 失敗した時だけ再生ボタンを出す
-  }
-}
-
-    async function runVisualUntilArticleStop() {
-      await runBlackout();
-      await runSearch();
-      await runArticle();
-    }
-
-   async function runEpilogueWithNarration() {
-  const video = prepareEpilogueVideo();
-
+  video.classList.remove('available');
+  video.controls = false;
   video.muted = true;
   video.playsInline = true;
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
+
+  try {
+    video.pause();
+    video.currentTime = 0;
+    video.load();
+  } catch (_) {}
+
+  return video;
+}
+
+async function runVisualUntilArticleStop() {
+  await runBlackout();
+  await runSearch();
+  await runArticle();
+}
+
+async function runEpilogueWithNarration() {
+  const video = prepareEpilogueVideo();
+
+  // 記事ページからエピローグへ切り替え
+  await switchPhase(phases.epilogue);
+
+  // ここで動画を表示
   video.classList.add('available');
 
   try {
     video.currentTime = 0;
   } catch (_) {}
-
-  // Safari対策：画面切り替えより先に再生命令を出す
-  const playPromise = video.play();
-
-  // 記事ページからエピローグへ切り替え
-  await switchPhase(phases.epilogue);
-
-  // BGMは止めない
-  // safePause(audio.bgm);
-
-  try {
-    if (playPromise && typeof playPromise.catch === 'function') {
-      await playPromise;
-    }
-  } catch (err) {
-    console.log('video play failed:', err);
-    video.controls = true;
-  }
-
-  // 動画の上に字幕を乗せる
-  await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
-
-  // by SUZUKI だけ最後に黒画面で出す
-  video.classList.remove('available');
-  await sleep(1200);
-  await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
-
-  safePause(video);
-}
 
   try {
     await video.play();
@@ -1381,11 +1340,11 @@
   // by SUZUKI だけ最後に黒画面で出す
   video.classList.remove('available');
   await sleep(1200);
+
   await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
 
   safePause(video);
 }
-
     async function runCredits() {
       await switchPhase(phases.credits);
       await sleep(8000);
