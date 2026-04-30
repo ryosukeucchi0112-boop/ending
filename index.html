@@ -824,9 +824,19 @@
       margin-bottom: 34px;
     }
     .suzuki {
-      font-size: clamp(18px, 5vw, 30px);
-      letter-spacing: .22em;
-      margin-bottom: 44px;
+  font-size: clamp(18px, 5vw, 30px);
+  letter-spacing: .22em;
+  margin-bottom: 14px;
+}
+
+.work-title {
+  font-family: var(--serif);
+  font-size: clamp(20px, 5.8vw, 36px);
+  letter-spacing: .12em;
+  line-height: 1.6;
+  margin-bottom: 44px;
+  color: rgba(255,255,255,.92);
+}
     }
     .final-button {
       display: inline-block;
@@ -1077,16 +1087,14 @@
       </div>
     </section>
 
-    <section class="phase credits-phase" id="phase-credits">
-      <div class="credits-content">
-        <div class="closed">connection closed</div>
-        <div class="suzuki">新アクティブノベルゲーム
-          <p/>
-            届かなかった告発
-        </div>
-        <a class="final-button" href="#" onclick="return false;">感想を書く</a>
-      </div>
-    </section>
+   <section class="phase credits-phase" id="phase-credits">
+  <div class="credits-content">
+    <div class="closed">connection closed</div>
+    <div class="suzuki">新アクティブノベルゲーム</div>
+    <div class="work-title">届かなかった通報</div>
+    <a class="final-button" href="#" onclick="return false;">感想を書く</a>
+  </div>
+</section>
   </div>
 
   <audio class="hidden-audio" id="bgm" src="assets/bgm.mp3" preload="auto" loop></audio>
@@ -1246,34 +1254,33 @@
     // 3〜5：三浦新聞 記事ページ
     // 6以降：記事停止後、「けれど。」のタイミングで作成済み動画を開始
     const narrationLines = [
-      { text: '君の通報は、届いた。', hold: 2800 },
-      { text: '本来、助からなかった彼女は、\n助かった。', hold: 3500 },
-      { text: '朝倉澪の名前が、\nもう一度、表示される。', hold: 3800 },
+  { text: '君の通報は、届いた。', hold: 2800 },
+  { text: '本来、助からなかった彼女は、\n助かった。', hold: 3500 },
+  { text: '朝倉澪の名前が、\nもう一度、表示される。', hold: 3800 },
 
-      { text: '黒崎たちは逮捕された。', hold: 2800 },
-      { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', hold: 4000 },
-      { text: '彼らの悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', hold: 4600 },
+  { text: '黒崎たちは逮捕された。', hold: 2800 },
+  { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', hold: 4000 },
+  { text: '彼らの悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', hold: 4600 },
 
-      { text: 'けれど。', hold: 2200, video: true },
-      { text: 'すべてが、\n救われたわけではない。', hold: 3800, video: true },
+  { text: 'けれど。', hold: 2200, video: true },
+  { text: 'すべてが、\n救われたわけではない。', hold: 3800, video: true },
 
-      { text: '成瀬栞は、\nもう帰らない。', hold: 3800, video: true },
-      { text: '彼女の時間は、\n戻らない。', hold: 3600, video: true },
-      { text: '笑っていた日も。', hold: 2600, video: true },
-      { text: '果たすはずだった約束も。', hold: 2900, video: true },
-      { text: 'もう、\n誰にも取り戻せない。', hold: 4200, video: true },
+  { text: '成瀬栞は、\nもう帰らない。', hold: 3800, video: true },
+  { text: '彼女の時間は、\n戻らない。', hold: 3600, video: true },
+  { text: '笑っていた日も。', hold: 2600, video: true },
+  { text: '果たすはずだった約束も。', hold: 2900, video: true },
+  { text: 'もう、\n誰にも取り戻せない。', hold: 4200, video: true },
 
-      { text: 'それでも。', hold: 2400, video: true },
-      { text: '朝倉澪の時間は、\n止まらない。', hold: 3800, video: true },
-      { text: '目を覚ました彼女は、\n歩を進める。', hold: 3600, video: true },
-      { text: 'もういない彼女を、\n探すように。', hold: 3600, video: true },
-      { text: '彼女との思い出を、\nひとつずつ振り返るように。', hold: 4200, video: true },
+  { text: 'それでも。', hold: 2400, video: true },
+  { text: '朝倉澪の時間は、\n止まらない。', hold: 3800, video: true },
+  { text: '目を覚ました彼女は、\n歩を進める。', hold: 3600, video: true },
+  { text: 'もういない彼女を、\n探すように。', hold: 3600, video: true },
+  { text: '彼女との思い出を、\nひとつずつ振り返るように。', hold: 4200, video: true },
 
-      { text: 'あの約束の山から見える景色を、\nもう一度見るために。', hold: 4600, video: true },
-      { text: '朝倉澪は、\n歩き始める。', hold: 3400, video: true },
-      { text: 'もういない彼女と、\n共に。', hold: 5200, video: true },
-      { text: ', hold: 3000, black: true },
-    ];
+  { text: 'あの約束の山から見える景色を、\nもう一度見るために。', hold: 4600, video: true },
+  { text: '朝倉澪は、\n歩き始める。', hold: 3400, video: true },
+  { text: 'もういない彼女と、\n共に。', hold: 5200, video: true }
+];
 
     const PRE_EPILOGUE_NARRATION = narrationLines.slice(0, 6);
     const EPILOGUE_NARRATION = narrationLines.slice(6);
@@ -1350,16 +1357,11 @@ async function runEpilogueWithNarration() {
     await video.play();
   } catch (err) {
     console.log('video play failed:', err);
-    // ここで controls=true にしない
   }
 
-  await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
+  await showNarration(EPILOGUE_NARRATION, 900);
 
   video.classList.remove('available');
-  await sleep(1200);
-
-  await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
-
   safePause(video);
 }
     async function runCredits() {
