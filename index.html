@@ -767,10 +767,22 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: .42;
-      display: none;
+      opacity: 0;
+      display: block;
+      transition: opacity 2.4s ease;
     }
-    .epilogue-video.available { display: block; }
+    .epilogue-video.available { opacity: 1; }
+
+    .epilogue-phase::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.48)),
+        radial-gradient(circle at 50% 50%, transparent 42%, rgba(0,0,0,.34));
+      z-index: 2;
+    }
     .epilogue-text-wrap {
       position: absolute;
       inset: 0;
@@ -1051,7 +1063,7 @@
 
     <section class="phase epilogue-phase" id="phase-epilogue">
       <div class="epilogue-bg" id="epilogueBg"></div>
-      <video class="epilogue-video" id="epilogueVideo" src="assets/ending.mov" muted playsinline loop></video>
+      <video class="epilogue-video" id="epilogueVideo" src="assets/epilogue.mp4" muted playsinline preload="auto"></video>
       <div class="noise"></div>
       <div class="epilogue-text-wrap">
         <div class="epilogue-line" id="epilogueLine"></div>
@@ -1190,101 +1202,117 @@
       const scroller = document.getElementById('articleScroll');
       const inner = document.getElementById('articleInner');
       scroller.scrollTop = 0;
-      await sleep(1300);
+      await sleep(900);
 
-      const maxScroll = Math.max(0, inner.offsetHeight - window.innerHeight + 40);
-      const duration = 15500;
+      // 記事は最後まで行かず、本文を読める位置で止める。
+      // 「けれど。」の直前に暗転へ切り替えるための余白を残す。
+      const maxScroll = Math.max(0, inner.scrollHeight - window.innerHeight + 40);
+      const stopRatio = 0.62; // 止める位置。低い=上で止まる / 高い=下まで進む
+      const targetScroll = maxScroll * stopRatio;
+      const duration = 11800;
       const start = performance.now();
 
       await new Promise(resolve => {
         function step(now) {
           const t = Math.min(1, (now - start) / duration);
           const eased = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-          scroller.scrollTop = eased * maxScroll;
+          scroller.scrollTop = eased * targetScroll;
           if (t < 1) requestAnimationFrame(step);
           else resolve();
         }
         requestAnimationFrame(step);
       });
 
-      await sleep(2600);
+      // 途中で止まったまま、字幕を少し読ませる。
+      await sleep(1200);
     }
 
   // ── ナレーション完全版 ──────────────────────────────────────────────────
-  // フェーズ3-4：TEMPORAL SEARCH 自動検索〜検索結果表示
-  // フェーズ5  ：三浦新聞 記事ページ
-  // フェーズ6  ：暗転
-  // フェーズ7  ：成瀬栞について（映像）
-  // フェーズ8  ：朝倉澪について
-  // フェーズ9  ：約束の山
+  // 0〜2：TEMPORAL SEARCH / 検索結果
+  // 3〜5：三浦新聞 記事ページ
+  // 6〜7：暗転。「けれど。」の後もすぐ映像を出さない
+  // 8以降：作成済み動画の上に字幕を重ねる
   const narrationLines = [
-    // フェーズ3-4
     { text: '君の通報は、届いた。', hold: 2800 },
     { text: '本来、助からなかった彼女は、\n助かった。', hold: 3500 },
     { text: '朝倉澪の名前が、\nもう一度、表示される。', hold: 3800 },
 
-    // フェーズ5
     { text: '黒崎たちは逮捕された。', hold: 2800 },
     { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', hold: 4000 },
     { text: '彼らの悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', hold: 4600 },
 
-    // フェーズ6
-    { text: 'けれど。', hold: 2200 },
-    { text: 'すべてが、\n救われたわけではない。', hold: 3800 },
+    { text: 'けれど。', hold: 2200, black: true },
+    { text: 'すべてが、\n救われたわけではない。', hold: 3800, black: true },
 
-    // フェーズ7
-    { text: '成瀬栞は、\nもう帰らない。', hold: 3800 },
-    { text: '彼女の時間は、\n戻らない。', hold: 3600 },
-    { text: '笑っていた日も。', hold: 2600 },
-    { text: '果たすはずだった約束も。', hold: 2900 },
-    { text: 'もう、\n誰にも取り戻せない。', hold: 4200 },
+    { text: '成瀬栞は、\nもう帰らない。', hold: 3800, video: true },
+    { text: '彼女の時間は、\n戻らない。', hold: 3600, video: true },
+    { text: '笑っていた日も。', hold: 2600, video: true },
+    { text: '果たすはずだった約束も。', hold: 2900, video: true },
+    { text: 'もう、\n誰にも取り戻せない。', hold: 4200, video: true },
 
-    // フェーズ8
-    { text: 'それでも。', hold: 2400 },
-    { text: '朝倉澪の時間は、\n止まらない。', hold: 3800 },
-    { text: '目を覚ました彼女は、\n歩を進める。', hold: 3600 },
-    { text: 'もういない彼女を、\n探すように。', hold: 3600 },
-    { text: '彼女との思い出を、\nひとつずつ振り返るように。', hold: 4200 },
+    { text: 'それでも。', hold: 2400, video: true },
+    { text: '朝倉澪の時間は、\n止まらない。', hold: 3800, video: true },
+    { text: '目を覚ました彼女は、\n歩を進める。', hold: 3600, video: true },
+    { text: 'もういない彼女を、\n探すように。', hold: 3600, video: true },
+    { text: '彼女との思い出を、\nひとつずつ振り返るように。', hold: 4200, video: true },
 
-    // フェーズ9
-    { text: 'あの約束の山から見える景色を、\nもう一度見るために。', hold: 4600 },
-    { text: '朝倉澪は、\n歩き始める。', hold: 3400 },
-    { text: 'もういない彼女と、\n共に。', hold: 5200 },
-    { text: 'by SUZUKI', hold: 3000 },
+    { text: 'あの約束の山から見える景色を、\nもう一度見るために。', hold: 4600, video: true },
+    { text: '朝倉澪は、\n歩き始める。', hold: 3400, video: true },
+    { text: 'もういない彼女と、\n共に。', hold: 5200, video: true },
+    { text: 'by SUZUKI', hold: 3000, black: true },
   ];
 
-    function setScene(scene) {
-      const bg = document.getElementById('epilogueBg');
-      bg.classList.remove('scene-hospital', 'scene-road', 'scene-hill');
-      if (scene === 'hospital') bg.classList.add('scene-hospital');
-      if (scene === 'road') bg.classList.add('scene-road');
-      if (scene === 'hill') bg.classList.add('scene-hill');
+  const SEARCH_NARRATION = narrationLines.slice(0, 3);
+  const ARTICLE_NARRATION = narrationLines.slice(3, 6);
+  const EPILOGUE_NARRATION = narrationLines.slice(6);
+
+  async function showNarration(items) {
+    const overlay = document.getElementById('narrationOverlay');
+    const line = document.getElementById('narrationLine');
+    overlay.classList.remove('hidden');
+
+    for (const item of items) {
+      line.textContent = item.text;
+      line.classList.add('visible');
+      await sleep(item.hold);
+      line.classList.remove('visible');
+      await sleep(850);
     }
+  }
 
-  async function runEpilogueVisualOnly() {
-  await switchPhase(phases.epilogue);
+  function prepareEpilogueVideo() {
+    const video = document.getElementById('epilogueVideo');
+    video.classList.remove('available');
+    try {
+      video.currentTime = 0;
+      video.load();
+    } catch (_) {}
+    return video;
+  }
 
-  const video = document.getElementById('epilogueVideo');
-  video.addEventListener('loadeddata', () => {
+  async function showVideoOnEpilogue() {
+    const video = document.getElementById('epilogueVideo');
     video.classList.add('available');
     safePlay(video);
-  }, { once: true });
+  }
 
-  try { video.load(); } catch (_) {}
+  async function runEpilogueWithNarration() {
+    await switchPhase(phases.epilogue);
+    const video = prepareEpilogueVideo();
 
-  const bg = document.getElementById('epilogueBg');
+    // 後半シナリオ通り、「けれど。」と「すべてが〜」は完全な黒画面のまま。
+    await showNarration(EPILOGUE_NARRATION.slice(0, 2));
 
-  await sleep(9000);
-  bg.classList.add('scene-hospital');
+    // ここから作成済み動画を表示し、その上に既存字幕を重ねる。
+    await showVideoOnEpilogue();
+    await showNarration(EPILOGUE_NARRATION.slice(2, -1));
 
-  await sleep(11000);
-  bg.classList.remove('scene-hospital');
-  bg.classList.add('scene-road');
-
-  await sleep(12000);
-  bg.classList.remove('scene-road');
-  bg.classList.add('scene-hill');
-}
+    // by SUZUKI は動画から暗転した後に出す。
+    video.classList.remove('available');
+    await sleep(1200);
+    await showNarration(EPILOGUE_NARRATION.slice(-1));
+    safePause(video);
+  }
 
     async function runCredits() {
       await switchPhase(phases.credits);
@@ -1298,21 +1326,21 @@ async function startSequence() {
   sequenceStarted = true;
   document.getElementById('startBtn').disabled = true;
 
+  // BGMを後半から入れたい場合は、この行を runEpilogueWithNarration の直前に移動。
   safePlay(audio.bgm);
-
-  const narrationPromise = runNarration();
 
   await runBlackout();
   await runSearch();
-  await runArticle();
+  await showNarration(SEARCH_NARRATION);
 
-  const visualPromise = runEpilogueVisualOnly();
+  const articlePromise = runArticle();
+  const articleNarrationPromise = showNarration(ARTICLE_NARRATION);
+  await Promise.all([articlePromise, articleNarrationPromise]);
 
-  await narrationPromise;
+  // ここで「けれど。」に入る。記事ページは途中停止した状態から暗転する。
+  await runEpilogueWithNarration();
 
   document.getElementById('narrationOverlay').classList.add('hidden');
-
-  await visualPromise;
   await runCredits();
 }
 window.addEventListener('DOMContentLoaded', () => {
@@ -1326,17 +1354,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   initTerminal();
 });
-    async function runNarration() {
-  const line = document.getElementById('narrationLine');
-
-  for (const item of narrationLines) {
-    line.textContent = item.text;
-    line.classList.add('visible');
-    await sleep(item.hold);
-    line.classList.remove('visible');
-    await sleep(900);
-  }
-}
   </script>
 </body>
 </html>
