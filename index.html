@@ -761,15 +761,15 @@
         linear-gradient(180deg, #263942, #26331e 55%, #080908);
     }
     .epilogue-video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      display: block;
-      transition: opacity 2.4s ease;
-    }
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  display: block;
+  transition: opacity .25s ease;
+}
     .epilogue-video.available { opacity: 1; }
 
     .epilogue-phase::after {
@@ -1291,15 +1291,26 @@
       return video;
     }
 
-    async function showVideoOnEpilogue() {
-      const video = document.getElementById('epilogueVideo');
-      video.classList.add('available');
+   async function showVideoOnEpilogue() {
+  const video = document.getElementById('epilogueVideo');
 
-      // 動画自体にBGMや環境音を入れている場合、その音を使う。
-      // 無音動画として使う場合は、HTML側のvideoタグに muted を戻してください。
-      try { video.volume = 1; } catch (_) {}
-      safePlay(video);
-    }
+  video.classList.add('available');
+
+  // Safari対策：音付き自動再生を避ける
+  video.muted = true;
+  video.playsInline = true;
+
+  try {
+    video.currentTime = 0;
+  } catch (_) {}
+
+  try {
+    await video.play();
+  } catch (err) {
+    console.log('video play failed:', err);
+    video.controls = true; // 失敗した時だけ再生ボタンを出す
+  }
+}
 
     async function runVisualUntilArticleStop() {
       await runBlackout();
@@ -1307,21 +1318,41 @@
       await runArticle();
     }
 
-    async function runEpilogueWithNarration() {
-      await switchPhase(phases.epilogue);
-      const video = prepareEpilogueVideo();
+   async function runEpilogueWithNarration() {
+  const video = prepareEpilogueVideo();
 
-      // 「けれど。」の字幕タイミングで動画を開始。
-      safePause(audio.bgm);
-      await showVideoOnEpilogue();
-      await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
+  // 先に動画を表示可能状態にしておく
+  video.muted = true;
+  video.playsInline = true;
+  video.classList.add('available');
 
-      // by SUZUKI は動画から暗転した後に出す。
-      video.classList.remove('available');
-      await sleep(1200);
-      await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
-      safePause(video);
-    }
+  try {
+    video.currentTime = 0;
+  } catch (_) {}
+
+  // 記事ページからエピローグへ切り替え
+  await switchPhase(phases.epilogue);
+
+  // 切り替わった瞬間に動画を再生
+  safePause(audio.bgm);
+
+  try {
+    await video.play();
+  } catch (err) {
+    console.log('video play failed:', err);
+    video.controls = true;
+  }
+
+  // 動画の上に字幕を乗せる
+  await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
+
+  // by SUZUKI だけ最後に黒画面で出す
+  video.classList.remove('available');
+  await sleep(1200);
+  await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
+
+  safePause(video);
+}
 
     async function runCredits() {
       await switchPhase(phases.credits);
