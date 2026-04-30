@@ -1062,7 +1062,15 @@
 
     <section class="phase epilogue-phase" id="phase-epilogue">
       <div class="epilogue-bg" id="epilogueBg"></div>
-     <video class="epilogue-video" id="epilogueVideo" src="assets/epilogue.mp4" playsinline muted preload="auto"></video>
+     <video
+  class="epilogue-video"
+  id="epilogueVideo"
+  src="assets/epilogue.mp4"
+  playsinline
+  webkit-playsinline
+  muted
+  preload="auto"
+></video>
       <div class="noise"></div>
       <div class="epilogue-text-wrap">
         <div class="epilogue-line" id="epilogueLine"></div>
@@ -1321,20 +1329,44 @@
    async function runEpilogueWithNarration() {
   const video = prepareEpilogueVideo();
 
-  // 先に動画を表示可能状態にしておく
   video.muted = true;
   video.playsInline = true;
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
   video.classList.add('available');
 
   try {
     video.currentTime = 0;
   } catch (_) {}
 
+  // Safari対策：画面切り替えより先に再生命令を出す
+  const playPromise = video.play();
+
   // 記事ページからエピローグへ切り替え
   await switchPhase(phases.epilogue);
 
-  // 切り替わった瞬間に動画を再生
-  safePause(audio.bgm);
+  // BGMは止めない
+  // safePause(audio.bgm);
+
+  try {
+    if (playPromise && typeof playPromise.catch === 'function') {
+      await playPromise;
+    }
+  } catch (err) {
+    console.log('video play failed:', err);
+    video.controls = true;
+  }
+
+  // 動画の上に字幕を乗せる
+  await showNarration(EPILOGUE_NARRATION.slice(0, -1), 900);
+
+  // by SUZUKI だけ最後に黒画面で出す
+  video.classList.remove('available');
+  await sleep(1200);
+  await showNarration(EPILOGUE_NARRATION.slice(-1), 900);
+
+  safePause(video);
+}
 
   try {
     await video.play();
