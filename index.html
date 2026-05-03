@@ -725,6 +725,69 @@
     text-align: left;
   }
 }
+
+
+/* ==============================
+   Ending safety / fiction notice
+   2026.05.03 修正版
+============================== */
+.disclaimer-phase {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.07), transparent 30%),
+    linear-gradient(180deg, #05070a 0%, #000 100%);
+  color: var(--white);
+  font-family: var(--sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.disclaimer-card {
+  width: min(760px, 100%);
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.055);
+  box-shadow: 0 24px 80px rgba(0,0,0,.42);
+  padding: clamp(24px, 5vw, 42px);
+  border-radius: 18px;
+  text-align: left;
+}
+
+.disclaimer-label {
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 5px 10px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: rgba(255,255,255,.68);
+}
+
+.disclaimer-card h2 {
+  margin: 0 0 16px;
+  font-family: var(--serif);
+  font-size: clamp(24px, 6vw, 40px);
+  line-height: 1.45;
+  letter-spacing: .08em;
+  font-weight: 600;
+}
+
+.disclaimer-card p {
+  margin: 0 0 12px;
+  color: rgba(245,241,232,.82);
+  line-height: 1.95;
+  font-size: clamp(14px, 3.8vw, 16px);
+}
+
+.disclaimer-card .small {
+  margin-top: 18px;
+  color: rgba(245,241,232,.55);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
     /* Phase 5: epilogue */
     .epilogue-phase {
       background: #000;
@@ -837,7 +900,6 @@
   margin-bottom: 44px;
   color: rgba(255,255,255,.92);
 }
-    }
     .final-button {
       display: inline-block;
       color: white;
@@ -915,7 +977,7 @@
       <div class="terminal">
         <div class="terminal-card">
           <div class="terminal-header">
-            <span>HAMAMATSU CENTRAL NORTH POLICE / RECEIVE TERMINAL</span>
+            <span>BORDOVER RESPONSE ARCHIVE / RECEIVE TERMINAL</span>
             <span>04.18 02:11</span>
           </div>
           <div class="terminal-body caret" id="terminalText"></div>
@@ -924,6 +986,28 @@
       </div>
     </section>
 
+
+
+
+    <section class="phase disclaimer-phase" id="phase-disclaimer">
+      <div class="noise"></div>
+      <div class="disclaimer-card">
+        <span class="disclaimer-label">FICTIONAL ENDING SEQUENCE</span>
+        <h2>この先は劇中エンディング演出です。</h2>
+        <p>
+          これより先の映像・画像・字幕は、物語の余韻を表現するための創作演出です。
+        </p>
+        <p>
+          使用される人物・施設・風景等の画像および映像には、AI生成画像またはAI生成素材をもとに制作した表現が含まれます。実在の人物・団体・施設・事件とは関係ありません。
+        </p>
+        <p>
+          このページはARG作品『届かなかった通報』内のフィクションであり、現実の報道・公的発表・実在機関の記録ではありません。
+        </p>
+        <p class="small">数秒後、自動でエピローグ映像に進みます。</p>
+      </div>
+    </section>
+
+    
     <section class="phase blackout" id="phase-blackout">
       <div class="noise"></div>
       <div class="blackout-text" id="blackoutText">04.17 接続を終了しています</div>
@@ -941,8 +1025,8 @@
         <div class="result-list" id="resultList">
           <div class="result-card">
             <div class="result-source">三浦新聞｜2026年4月18日 02:16</div>
-            <div class="result-title">朝倉澪さんの転落事件、関係者三名を逮捕</div>
-            <div class="result-snippet">成瀬栞さん死亡事案との関連浮上。浜松中央北署は18日未明、城南記念総合病院の医師、学校法人関係者ら三名を逮捕したと発表した...</div>
+            <div class="result-title">【劇中記事】朝倉澪さんの転落事件、関係者三名の関与が明らかに</div>
+            <div class="result-snippet">成瀬栞さんの件との関連が浮上。劇中の調査記録では、病院・学校関係者ら三名の関与が新たに示された...</div>
           </div>
         </div>
       </div>
@@ -984,12 +1068,12 @@
             <div class="miura-grid">
               <article class="miura-article">
                 <div class="miura-category-wrap">
-  <span class="miura-category">速報</span>
+  <span class="miura-category">劇中記事</span>
   <span class="miura-category-sub">社会</span>
 </div>
 
-<h1 class="miura-article-title">朝倉澪さんの転落事件、関係者三名を逮捕</h1>
-<p class="miura-article-subtitle">成瀬栞さん死亡事案との関連浮上</p>
+<h1 class="miura-article-title">【劇中記事】朝倉澪さんの転落事件、関係者三名の関与が明らかに</h1>
+<p class="miura-article-subtitle">成瀬栞さんの件との関連が浮上</p>
 
 <div class="miura-meta">
                   <span>記者：三浦さやか</span>
@@ -998,23 +1082,23 @@
                 </div>
 
                 <p class="miura-lead">
-                  浜松中央北署は18日未明、私立星浜学園高等部の女子生徒・朝倉澪さんが校内で転落した事件について、関係者三名を逮捕したと発表した。成瀬栞さん死亡事案との関連も調べている。
+                  劇中の調査記録によると、18日未明、私立星浜学園高等部の女子生徒・朝倉澪さんが校内で転落した件について、病院・学校関係者ら三名の関与が新たに示された。成瀬栞さんの件との関連も、物語上の重要な焦点として扱われている。
                 </p>
 
                 <p>
-                  浜松中央北署は18日未明、私立星浜学園高等部の女子生徒・朝倉澪さんが校内で転落し、意識不明の状態で城南記念総合病院へ搬送された事件について、同病院の医師・藍沢晋作容疑者、学校法人関係者で同病院の運営にも関与していた黒崎恒一郎容疑者、同学園関係者の黒崎蓮司容疑者の三名を逮捕したと発表した。
+                  劇中の更新記録では、私立星浜学園高等部の女子生徒・朝倉澪さんが校内で転落し、城南記念総合病院へ搬送された件について、同病院の医師・藍沢晋作、学校法人関係者で同病院の運営にも関与していた黒崎恒一郎、同学園関係者の黒崎蓮司の三名が、事案の中心人物として扱われている。
                 </p>
 
                 <p>
-                  捜査関係者によると、三名は約三か月前に発生した成瀬栞さんの死亡事案に関する医療記録の改ざん、および朝倉さんに対する圧力行為に関与した疑いがある。署は、成瀬さんの容体急変後の説明内容や院内記録に不自然な点があったとして、関係先から押収した資料の確認を進めている。
+                  物語内の記録によると、三名は約三か月前に発生した成瀬栞さんの死亡事案に関する医療記録の改ざん、および朝倉さんに対する圧力行為に関与していた可能性が示されている。成瀬さんの容体急変後の説明内容や院内記録には不自然な点があり、保全された資料の照合が進められている。
                 </p>
 
                 <p>
-                  また、朝倉さんが一連の記録を調べていたことを把握したうえで、証拠隠滅を図っていた可能性もあるとみている。朝倉さんは現在、命に別状はないものの、治療と安全確保のため、別の医療機関への転院に向けて調整が進められている。
+                  また、朝倉さんが一連の記録を調べていたことを把握したうえで、関係資料を消そうとしていた可能性も示されている。朝倉さんは現在、命に別状はないものの、治療と安全確保のため、別の医療機関への転院に向けて調整が進められている。
                 </p>
 
                 <p>
-                  同署は今後、三名の関係性や指示系統、病院内で行われた記録管理の実態について詳しく調べる方針。成瀬さん死亡事案についても、医療上の過失とその後の説明対応に問題がなかったか、慎重に捜査を進めるとしている。
+                  今後、三名の関係性や指示系統、病院内で行われた記録管理の実態が、劇中記事の中で順次明らかになっていく見通し。成瀬さんの件についても、医療上の過失とその後の説明対応に問題がなかったかが、物語上の重要な争点として残されている。
                 </p>
 
                 <div class="miura-back-link">
@@ -1022,7 +1106,7 @@
                 </div>
 
                 <div class="miura-note">
-                  ※本ページはフィクションとして制作されたもので、実在の名称・人物・出来事とは関係ありません。
+                  ※本ページはARG作品内の架空記事です。実在の新聞社・報道機関・人物・団体・事件・公的発表とは関係ありません。
                 </div>
               </article>
 
@@ -1069,8 +1153,7 @@
         </div>
       </div>
     </section>
-
-    <section class="phase epilogue-phase" id="phase-epilogue">
+<section class="phase epilogue-phase" id="phase-epilogue">
       <div class="epilogue-bg" id="epilogueBg"></div>
      <video
   class="epilogue-video"
@@ -1110,6 +1193,7 @@
       blackout: document.getElementById('phase-blackout'),
       search: document.getElementById('phase-search'),
       article: document.getElementById('phase-article'),
+      disclaimer: document.getElementById('phase-disclaimer'),
       epilogue: document.getElementById('phase-epilogue'),
       credits: document.getElementById('phase-credits'),
     };
@@ -1179,7 +1263,7 @@
 照合完了
 緊急性：高
 対応区分：即時対応
-担当：浜松中央北署　野上孝明
+担当：BORDOVER RESPONSE ARCHIVE　野上孝明
 
 通報は受理されました。`;
       await typeText(terminalText, text, 25);
@@ -1258,7 +1342,8 @@
   { text: '本来、助からなかった彼女は、\n助かった。', hold: 3500 },
   { text: '朝倉澪の名前が、\nもう一度、表示される。', hold: 3800 },
 
-  { text: '黒崎たちは逮捕された。', hold: 2800 },
+  { text: '黒崎たちの関与は、
+明るみに出た。', hold: 3000 },
   { text: '彼らが重ねてきた罪も、\n少しずつ明るみに出はじめた。', hold: 4000 },
   { text: '彼らの悪行は広く知れ渡り、\nもう二度と、日の目を見ることはないだろう。', hold: 4600 },
 
@@ -1342,6 +1427,12 @@ async function runVisualUntilArticleStop() {
   await runArticle();
 }
 
+
+async function runEndingDisclaimer() {
+  await switchPhase(phases.disclaimer);
+  await sleep(6200);
+}
+
 async function runEpilogueWithNarration() {
   const video = prepareEpilogueVideo();
 
@@ -1380,8 +1471,10 @@ async function startSequence() {
 
   document.getElementById('startBtn').disabled = true;
 
-  // 参照scriptと同じ考え方：字幕は開始直後から通しで進め、
-  // 映像側は blackout → search → article の順に進める。
+  // 通報受理後、まず劇中演出・AI生成素材を含む旨の免責を挟む。
+  await runEndingDisclaimer();
+
+  // 免責文の後に暗転し、TEMPORAL SEARCH → 三浦新聞風記事へ進める。
   safePlay(audio.bgm);
 
   const narrationPromise = showNarration(PRE_EPILOGUE_NARRATION, 900);
